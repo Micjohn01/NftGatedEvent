@@ -9,7 +9,7 @@ contract EventNFT is ERC721, Ownable {
       uint256 private _nextTokenId;
     mapping(uint256 => uint256) public tokenToEventId;
 
-    constructor(string memory name, string memory symbol) ERC721(name, symbol) {}
+    constructor(string memory name, string memory symbol) ERC721("Micjohn", "MJC") {}
 
     function mintNFT(address to, uint256 eventId) public onlyOwner {
         uint256 tokenId = _nextTokenId++;
