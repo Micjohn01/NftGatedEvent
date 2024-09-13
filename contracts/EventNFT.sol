@@ -6,36 +6,30 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract EventNFT is ERC721, Ownable {
-    constructor(address initialOwner)
-        ERC721("MicJohn", "MJ")
-        Ownable(initialOwner)
-    {}
+      uint256 private _nextTokenId;
+    mapping(uint256 => uint256) public tokenToEventId;
 
-    function safeMint(address to, uint256 tokenId, string memory uri)
-        public
-        onlyOwner
-    {
+    constructor(string memory name, string memory symbol) ERC721(name, symbol) {}
+
+    function mintNFT(address to, uint256 eventId) public onlyOwner {
+        uint256 tokenId = _nextTokenId++;
         _safeMint(to, tokenId);
-        _setTokenURI(tokenId, uri);
+        tokenToEventId[tokenId] = eventId;
     }
 
-    // The following functions are overrides required by Solidity.
-
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        override(ERC721, ERC721URIStorage)
-        returns (string memory)
-    {
-        return super.tokenURI(tokenId);
+    function getEventIdForToken(uint256 tokenId) public view returns (uint256) {
+        require(_exists(tokenId), "Token does not exist");
+        return tokenToEventId[tokenId];
     }
 
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(ERC721, ERC721URIStorage)
-        returns (bool)
-    {
-        return super.supportsInterface(interfaceId);
+    function ownsNFTForEvent(address owner, uint256 eventId) public view returns (bool) {
+        uint256 balance = balanceOf(owner);
+        for (uint256 i = 0; i < balance; i++) {
+            uint256 tokenId = tokenOfOwnerByIndex(owner, i);
+            if (tokenToEventId[tokenId] == eventId) {
+                return true;
+            }
+        }
+        return false;
     }
 }
